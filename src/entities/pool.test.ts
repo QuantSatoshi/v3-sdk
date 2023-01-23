@@ -243,12 +243,41 @@ describe('Pool', () => {
     })
 
     describe('#getOutputAmount with insufficient liquidity', () => {
-      it('pool2 USDC -> DAI', async () => {
+      it('pool2 TOK -> DAI', async () => {
         const inputAmount = CurrencyAmount.fromRawAmount(TOK, '1000000000000000000')
         const [outputAmount, amountSpecifiedRemaining] = await pool.getOutputAmount(inputAmount)
         expect(outputAmount.currency.equals(DAI)).toBe(true);
         expect(outputAmount.quotient).toEqual(JSBI.BigInt('269197620579047'));
         expect(amountSpecifiedRemaining).toEqual(JSBI.BigInt('888118955005465234'));
+      })
+    })
+  })
+
+  describe('swap zero to one = false', () => {
+    let pool: Pool
+
+    beforeEach(() => {
+      const liquidity = JSBI.BigInt('1369662156156529329778504');
+      const tickCurrent = -74014;
+      const sqftPriceX96 = JSBI.BigInt('1957862427046104180027585824');
+      pool = new Pool(TOK, DAI, FeeAmount.MEDIUM, sqftPriceX96, liquidity, tickCurrent, [
+        {
+          index: -74160,
+          liquidityNet: '1369662156156529329778504',
+          liquidityGross: '1369662156156529329778504'
+        }, {
+          index: -73980,
+          liquidityNet: '-1369662156156529329778504',
+          liquidityGross: '1369662156156529329778504'
+        }
+      ])
+    })
+
+    describe('#getOutputAmount', () => {
+      it('pool2 DAI -> TOK', async () => {
+        const inputAmount = CurrencyAmount.fromRawAmount(DAI, '1000000000000000')
+        const [outputAmount] = await pool.getOutputAmount(inputAmount);
+        expect(outputAmount.quotient).toEqual(JSBI.BigInt('1632638257187627447'));
       })
     })
   })
