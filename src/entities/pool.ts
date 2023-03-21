@@ -37,6 +37,7 @@ export class Pool {
   public readonly liquidity: JSBI
   public readonly tickCurrent: number
   public readonly tickDataProvider: TickDataProvider
+  public readonly blockNumber: number
 
   private _token0Price?: Price<Token, Token>
   private _token1Price?: Price<Token, Token>
@@ -74,7 +75,8 @@ export class Pool {
     sqrtRatioX96: BigintIsh,
     liquidity: BigintIsh,
     tickCurrent: number,
-    ticks: TickDataProvider | (Tick | TickConstructorArgs)[] = NO_TICK_DATA_PROVIDER_DEFAULT
+    ticks: TickDataProvider | (Tick | TickConstructorArgs)[] = NO_TICK_DATA_PROVIDER_DEFAULT,
+    blockNumber?: number,
   ) {
     invariant(Number.isInteger(fee) && fee < 1_000_000, 'FEE')
 
@@ -92,6 +94,7 @@ export class Pool {
     this.liquidity = JSBI.BigInt(liquidity)
     this.tickCurrent = tickCurrent
     this.tickDataProvider = Array.isArray(ticks) ? new TickListDataProvider(ticks, TICK_SPACINGS[fee]) : ticks
+    this.blockNumber = blockNumber || 0
   }
 
   /**
